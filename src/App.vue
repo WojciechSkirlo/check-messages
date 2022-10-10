@@ -1,12 +1,29 @@
+<template>
+  <main class="flex flex-col w-full min-h-screen px-6 py-8 bg-[#F5F5F5]">
+    <div class="w-full p-4 mb-8 text-center bg-white rounded-xl">
+      <input type="file" multiple @change="getFiles" />
+    </div>
+    <div v-if="!isLoader" class="flex flex-col gap-y-5">
+      <PersonItem v-for="(item, index) in persons" :item="item" :index="index" :key="index" />
+    </div>
+    <div v-else>Loader</div>
+  </main>
+</template>
+
 <script setup lang="ts">
 import * as zip from "@zip.js/zip.js";
-
 import { ref } from "vue";
-const participants: any = ref("");
-const qtyOfMessages: any = ref("");
+import type { Ref } from 'vue'
+import PersonItem from "../src/components/PersonItem.vue";
 
-const d = (s: string) => new TextDecoder().decode(new Uint8Array(s.split('').map((r: any) => r.charCodeAt())))
+interface Person {
+  id: string,
+  name: string,
+  totalMessages: number,
+}
 
+const persons: Ref<Array<Person>> = ref([]);
+const isLoader = ref(true);
 
 const getFiles = async (e: any) => {
   const reader = new FileReader();
@@ -14,97 +31,55 @@ const getFiles = async (e: any) => {
   console.log(e.target.files, "e");
 
   reader.onload = async (event) => {
-    // console.log("event", event.target.f)
-    // const zip = event.target?.result!;
-    const blob = new Blob([event.target?.result!])
+    const blob = new Blob([event.target?.result!]);
     const reader = new zip.ZipReader(new zip.BlobReader(blob));
     let entries = await reader.getEntries() || [];
 
-    // entries = entries.filter((item: any) => !item.directory);
-    if (entries.length) {
+    // entry filter
+    entries = entries.filter((item: any) => {
+      const extension = item.filename.split(".").pop();
+      return extension === "json";
+    });
 
-      const text = await entries[0].getData(new zip.TextWriter());
-      // text contains the entry data as a String
-      console.log(text);
+    // inbox
+    entries = entries.filter((item: any) => {
+      let folderName = item.filename.split("/");
+
+      if (folderName.length >= 2) {
+        folderName = folderName[1];
+        return folderName === "inbox"
+        // || folderName === "archived_threads";
+      }
+    });
+
+
+    for (const entry of entries) {
+      const json = JSON.parse(await entry.getData?.(new zip.TextWriter())!);
+      const userFolderName = entry.filename.split("/")[2];
+
+      const index = persons.value.findIndex((item: Person) => item.id === userFolderName);
+      if (index > -1) {
+        persons.value[index].totalMessages += json.messages.length;
+      } else {
+        const person: Person = {
+          id: userFolderName,
+          name: json.title,
+          totalMessages: json.messages.length,
+        }
+
+        persons.value.push(person)
+      }
     }
 
-    console.log(entries, "entries");
+    persons.value.sort((a: Person, b: Person) => b.totalMessages - a.totalMessages);
+    persons.value = persons.value.splice(0, 100);
+    isLoader.value = false;
+    console.log("pers", persons.value)
 
     await reader.close();
-    // const zipFileReader = new BlobReader(blob);
-    // const zipReader = new ZipReader(zipFileReader);
+  };
 
-    // const firstEntry = await zipReader.getEntries();
-
-
-
-    // console.log(firstEntry)
-
-    // console.log(zipReader)
-    // const reader = new zip.ZipReader(new zip.BlobReader(blob));
-
-    // // get all entries from the zip
-    // const entries = await reader.getEntries();
-    // if (entries.length) {
-
-    //   // get first entry content as text by using a TextWriter
-    //   const text = await entries[0].getData(
-    //     // writer
-    //     new zip.TextWriter(),
-    //     // options
-    //     {
-    //       onprogress: (index, max) => {
-    //         // onprogress callback
-    //       }
-    //     }
-    //   );
-    //   // text contains the entry data as a String
-    //   console.log(text);
-    // }
-
-    // console.log("e", event);
-    // const csv: string = 
-    // let result = e.target?.result!
-    // result = typeof result === 'string' ? result : result.toString();
-    // participants.value = JSON.parse(result).participants;
-    // qtyOfMessages.value = JSON.parse(result).messages.length;
-    // console.log("result:", JSON.parse(result));
-  }
 
   reader.readAsArrayBuffer(e.target?.files[0]);
-
-  // Displays "Hello world!".
-  // console.log(helloWorldText);
-
-
-
-
-  // reader.onload = (e) => {
-  //   console.log(e.target?.result);
-  // }
-
-  // console.log([...file.target?.files].filter((item: any) => item.type === 'application/json'))
-
-
-
-  // console.log("file", file.target.files[0])
-}
-
-// const reader = new FileReader();
-
+};
 </script>
-
-<template>
-  <main class="bg-red-200">
-    <input type="file" @change="getFiles" />
-    <div v-if="participants">
-      <span>Participants:</span>
-      {{d(participants[0].name)}} |
-      {{d(participants[1].name)}}
-    </div>
-    <div v-if="participants">
-      <span>Quantity of messages:</span>
-      {{qtyOfMessages}}
-    </div>
-  </main>
-</template>
