@@ -9,8 +9,8 @@
       <div class="flex items-center justify-between w-full gap-x-5">
         <h3 class="min-w-0 font-medium truncate">{{decodeText(item.name)}}</h3>
         <div
-          class="flex justify-center align-bottom items-center min-w-[27px] h-6 px-4 text-xs  rounded-full whitespace-nowrap"
-          :class="index + 1 === 1 ? 'bg-[#fde68a] text-black' : index + 1 === 2 ? 'bg-gray-200 text-black' : index + 1 === 3 ? 'bg-[#d97706] text-vlack' :'text-white bg-black'">
+          class="flex justify-center align-bottom items-center min-w-[27px] h-6 px-4 text-xs rounded-full whitespace-nowrap"
+          :class="index + 1 <= 3 ? 'bg-black text-white border border-black' :'border border-gray-100'">
           {{index + 1}}
         </div>
       </div>
@@ -19,6 +19,9 @@
         <span class="text-gray-400">messages</span>
       </div>
     </div>
+
+    <!-- I dont know does i like this view -->
+    <!-- :class="index + 1 === 1 ? 'bg-[#fde68a] text-black' : index + 1 === 2 ? 'bg-gray-200 text-black' : index + 1 === 3 ? 'bg-[#d97706] text-vlack' :'text-white bg-black'"> -->
   </div>
 </template>
 <script setup lang="ts">
