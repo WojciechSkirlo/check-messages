@@ -1,16 +1,23 @@
 <template>
-  <div
-    class="flex items-center h-20 gap-4 transition-colors duration-300 p-[15px] pr-[18px] rounded-[15px] bg-[#F9F9F9] border border-white shadow-custom">
-    <div class="w-[50px] h-[50px] bg-gray-200 rounded-[15px]" style="box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.08)">
+  <div class="flex items-center w-full px-6 py-4 transition-colors duration-300 gap-x-6 hover:bg-gray-50">
+    <div class="w-12 h-12 overflow-hidden bg-gray-100 rounded-full shrink-0">
       <img
         src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cG9ydHJhaXR8ZW58MHx8MHx8&w=1000&q=80"
-        alt="" class="object-cover w-full h-full rounded-[15px]" />
+        alt="" class="object-cover w-full h-full" />
     </div>
-    <div class="flex flex-1">
-      <div class="p-2 text-white bg-black">{{index + 1}}</div>
-      <div class="bg-red-200">{{ item.totalMessages }}</div>
-      <div class="ml-3 bg-red-200">{{ decodeText(item.name) }}</div>
-      <div></div>
+    <div class="flex flex-col w-[calc(100%-70px)]">
+      <div class="flex items-center justify-between w-full gap-x-5">
+        <h3 class="min-w-0 font-medium truncate">{{decodeText(item.name)}}</h3>
+        <div
+          class="flex justify-center align-bottom items-center min-w-[27px] h-6 px-4 text-xs  rounded-full whitespace-nowrap"
+          :class="index + 1 === 1 ? 'bg-[#fde68a] text-black' : index + 1 === 2 ? 'bg-gray-200 text-black' : index + 1 === 3 ? 'bg-[#d97706] text-vlack' :'text-white bg-black'">
+          {{index + 1}}
+        </div>
+      </div>
+      <div class="self-start px-5 py-1 mt-3 text-sm border border-gray-100 rounded-full">
+        <b class="mr-3">{{ item.totalMessages }}</b>
+        <span class="text-gray-400">messages</span>
+      </div>
     </div>
   </div>
 </template>
