@@ -1,26 +1,31 @@
 <template>
-  <main class="bg-white">
-    <swiper class="w-full mySwiper">
-      <swiper-slide class="h-screen bg-gray-200">
+  <main class="w-full  bg-white md:max-w-[390px]  md:border md:border-black">
+    <swiper class="w-full h-full mySwiper" @swiper="setSwiper">
+      <swiper-slide class="w-full h-screen md:h-[820px]">
         <!-- File page -->
-        <div class="w-full p-4 mb-8 text-center bg-gray-300 rounded-xl">
-          <input type="file" multiple @change="getFiles" />
+        <div @click="test">test</div>
+        <div class="relative w-full h-full p-8 text-center">
+          <BaseInputFile @update:model-value="getFiles" />
         </div>
+        <Transition name="fade">
+          <BaseLoader v-if="isLoader" :is-loaded="isLoaded" @check-results="mySwiper.slideNext()" />
+        </Transition>
       </swiper-slide>
-      <swiper-slide>
+      <swiper-slide class="w-full h-screen md:h-[820px]">
         <!-- Result page -->
-        <div class="flex flex-col w-full h-screen py-8 overflow-auto">
+        <div class="flex flex-col w-full h-full py-8 overflow-auto">
           <div class="flex flex-col px-6">
             <!-- Navigation -->
             <div class="flex items-center justify-between w-full mb-8 gap-x-6">
-              <button class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl">
+              <button class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl"
+                @click="mySwiper.slidePrev()">
                 <svg width="7" height="13" viewBox="0 0 7 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" clip-rule="evenodd"
                     d="M6.74372 0.256282C6.40201 -0.0854272 5.84799 -0.0854272 5.50628 0.256282L0.256282 5.50628C-0.0854273 5.84799 -0.0854273 6.40201 0.256282 6.74372L5.50628 11.9937C5.84799 12.3354 6.40201 12.3354 6.74372 11.9937C7.08543 11.652 7.08543 11.098 6.74372 10.7563L2.11244 6.125L6.74372 1.49372C7.08543 1.15201 7.08543 0.59799 6.74372 0.256282Z"
                     fill="#101010" />
                 </svg>
               </button>
-              <h2 class="text-lg font-semibold first-letter:uppercase">messages top 100</h2>
+              <h2 class="text-lg font-semibold first-letter:uppercase">messenger top 100</h2>
               <div class="h-9 w-9"></div>
             </div>
 
@@ -50,10 +55,10 @@
 import * as zip from "@zip.js/zip.js";
 import { ref } from "vue";
 import type { Ref } from 'vue'
+import BaseInputFile from "../src/components/BaseInputFile.vue";
+import BaseLoader from "../src/components/BaseLoader.vue"
 import PersonItem from "../src/components/PersonItem.vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
-
-// Import Swiper styles
 import "swiper/css";
 
 interface Person {
@@ -62,23 +67,23 @@ interface Person {
   totalMessages: number,
 }
 
-const persons: Ref<Array<Person>> = ref([
-  { id: 'wdasd', name: 'Rock JD 1', totalMessages: 1 },
-  { id: 'wdasd 2123', name: 'Rock JD 2 asd3  dqw 12 d12d d12 d 12', totalMessages: 1 },
-  { id: 'wdasd 2', name: 'Rock JD 3', totalMessages: 1 },
-  { id: 'wdasd 3', name: 'Rock JD 4', totalMessages: 1 },
-  { id: 'wdasd 4', name: 'Rock JD 4', totalMessages: 1 },
-  { id: 'wdasd 5', name: 'Rock JD 4', totalMessages: 1 },
-  { id: 'wdasd 6', name: 'Rock JD 4', totalMessages: 1 },
-  { id: 'wdasd 7', name: 'Rock JD 4', totalMessages: 1 },
-]);
+const mySwiper: Ref<any> = ref(null);
+const setSwiper = (swiper: any) => {
+  mySwiper.value = swiper;
+}
+
+const isLoader = ref(false);
+const isLoaded = ref(false);
 
 const isFilePage = ref(true);
+const persons: Ref<Array<Person>> = ref([]);
 
-const getFiles = async (e: any) => {
+const getFiles = async (files: any) => {
+  if (files.length < 1) return
+  isLoader.value = true;
   const reader = new FileReader();
 
-  console.log(e.target.files, "e");
+  console.log("files", files);
 
   reader.onload = async (event) => {
     const blob = new Blob([event.target?.result!]);
@@ -127,9 +132,27 @@ const getFiles = async (e: any) => {
     console.log("pers", persons.value)
 
     await reader.close();
+    setTimeout(() => {
+      isLoaded.value = true;
+    }, 1000)
+    isLoaded.value = true;
   };
 
-
-  reader.readAsArrayBuffer(e.target?.files[0]);
+  reader.readAsArrayBuffer(files[0]);
 };
+
+function test() {
+  console.log("moze conffetti")
+} 
 </script>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  @apply transition-opacity duration-500;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  @apply opacity-0;
+}
+</style>

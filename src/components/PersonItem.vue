@@ -1,9 +1,9 @@
 <template>
   <div class="flex items-center w-full px-6 py-4 transition-colors duration-300 gap-x-6 hover:bg-gray-50">
     <div class="w-12 h-12 overflow-hidden bg-gray-100 rounded-full shrink-0">
-      <img
+      <!-- <img
         src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cG9ydHJhaXR8ZW58MHx8MHx8&w=1000&q=80"
-        alt="" class="object-cover w-full h-full" />
+        alt="" class="object-cover w-full h-full" /> -->
     </div>
     <div class="flex flex-col w-[calc(100%-70px)]">
       <div class="flex items-center justify-between w-full gap-x-5">

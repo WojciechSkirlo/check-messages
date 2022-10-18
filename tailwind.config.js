@@ -3,6 +3,7 @@ module.exports = {
   content: ["./src/**/*.{html,js,vue}"],
   theme: {
     spacing: {
+      "0": "0px",
       "1": "1px",
       "2": "2px",
       "3": "5px",
@@ -16,6 +17,10 @@ module.exports = {
       "10": "40px",
       "11": "45px",
       "12": "50px",
+      "14": "60px",
+      "24": "100px",
+      "36": "150px",
+      "48": "200px",
     },
     colors: {
       black: "#000000",
@@ -37,7 +42,29 @@ module.exports = {
       sm: ["12px", "18px"],
       base: ["16px", "24px"],
       lg: ["20px", "30px"],
+    },
+    extend: {
+      animation: {
+        "pulse-slow": "pulse-slow 1.6s ease infinite",
+        "pulse-slow-one": "pulse-slow-one 1s ease",
+        "pulse-color": "pulse-color 1.6s ease infinite",
+      },
+      keyframes: {
+        "pulse-slow": {
+          "0%, 100%": { transform: "scale(0.9)" },
+          "50%": { transform: "scale(1.1)" },
+        },
+
+        "pulse-slow-one": {
+          "0%": { transform: "scale(0)" },
+          "100%": { transform: "scale(1)" },
+        },
+
+        "pulse-color": {
+          "0%, 100%": { opacity: "0.5" },
+          "50%": { opacity: "1" },
+        }
+      }
     }
   },
-  plugins: [],
 };
