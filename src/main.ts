@@ -4,5 +4,6 @@ import "./assets/main.css";
 import Particles from "vue3-particles";
 
 const app = createApp(App);
+
 app.use(Particles);
 app.mount("#app");

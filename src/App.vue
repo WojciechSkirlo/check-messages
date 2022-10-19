@@ -1,55 +1,25 @@
 <template>
-  <main class="w-full bg-white md:max-w-[390px]  md:border md:border-black">
-    <swiper class="w-full h-full mySwiper" @swiper="setSwiper"
-      @slide-change-transition-end="isLoader = false; isLoaded = false;">
+  <main class="w-full bg-white md:max-w-[390px] md:border md:border-black">
+    <swiper class="w-full h-full mySwiper" @swiper="setSwiper" @slide-change-transition-end="resetFileSection">
       <swiper-slide class="w-full h-screen md:h-[820px]">
-        <!-- File page -->
-        <Transition name="fade">
-          <div class="relative w-full h-full p-8 text-center">
-            <BaseInputFile v-if="!isLoader" @update:model-value="getFiles" />
+        <div class="flex flex-col w-full h-full py-8">
+          <div class="flex flex-col px-6">
+            <div class="flex items-center justify-center w-full mb-8 gap-x-6">
+              <h2 class="text-lg font-semibold first-letter:uppercase">messages</h2>
+            </div>
           </div>
-        </Transition>
-        <Transition name="fade">
-          <BaseLoader v-if="isLoader" :is-loaded="isLoaded" @check-results="mySwiper.slideNext()" />
-        </Transition>
+          <Transition name="fade">
+            <div class="relative w-full h-full p-8 text-center">
+              <BaseInputFile v-if="!isLoader" @update:model-value="getFiles" />
+            </div>
+          </Transition>
+          <Transition name="fade">
+            <BaseLoader v-if="isLoader" :is-loaded="isLoaded" @check-results="mySwiper.slideNext()" />
+          </Transition>
+        </div>
       </swiper-slide>
       <swiper-slide class="w-full h-screen md:h-[820px]">
-        <!-- Result page -->
-        <div class="flex flex-col w-full h-full py-8 overflow-auto">
-          <div class="flex flex-col px-6">
-            <!-- Navigation -->
-            <div class="flex items-center justify-between w-full mb-8 gap-x-6">
-              <button class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl"
-                @click="mySwiper.slidePrev()">
-                <svg width="7" height="13" viewBox="0 0 7 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M6.74372 0.256282C6.40201 -0.0854272 5.84799 -0.0854272 5.50628 0.256282L0.256282 5.50628C-0.0854273 5.84799 -0.0854273 6.40201 0.256282 6.74372L5.50628 11.9937C5.84799 12.3354 6.40201 12.3354 6.74372 11.9937C7.08543 11.652 7.08543 11.098 6.74372 10.7563L2.11244 6.125L6.74372 1.49372C7.08543 1.15201 7.08543 0.59799 6.74372 0.256282Z"
-                    fill="#101010" />
-                </svg>
-              </button>
-              <h2 class="text-lg font-semibold first-letter:uppercase">messenger</h2>
-              <div class="h-9 w-9"></div>
-            </div>
-
-            <!-- Input -->
-            <div class="flex items-center w-full gap-4 px-6 py-4.5 mb-6 border border-gray-100 rounded-xl">
-              <input type="text" placeholder="Search user"
-                class="flex-1 order-1 text-sm outline-none peer placeholder:text-gray-200" />
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="#00ffff" xmlns="http://www.w3.org/2000/svg"
-                class="transition-colors duration-300 peer-focus:fill-black fill-gray-200">
-                <path
-                  d="M4.70412 9.40774C5.74783 9.40753 6.76147 9.05814 7.58363 8.41522L10.1685 11L11 10.1686L8.41508 7.58381C9.05837 6.76162 9.40799 5.7478 9.40824 4.70387C9.40824 2.11027 7.29786 0 4.70412 0C2.11039 0 0 2.11027 0 4.70387C0 7.29747 2.11039 9.40774 4.70412 9.40774ZM4.70412 1.17597C6.64986 1.17597 8.23221 2.75823 8.23221 4.70387C8.23221 6.64951 6.64986 8.23177 4.70412 8.23177C2.75838 8.23177 1.17603 6.64951 1.17603 4.70387C1.17603 2.75823 2.75838 1.17597 4.70412 1.17597Z" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Results -->
-          <div class="flex flex-col gap-y-3">
-            <PersonItem v-for="(item, index) in persons" :item="item" :index="index" :key="item.id" />
-            <p v-if="!persons.length" class="px-8 text-sm text-gray-300 first-letter:uppercase">There is no results :/
-            </p>
-          </div>
-        </div>
+        <ResultSection :persons="persons" @slide-prev="mySwiper.slidePrev()" />
       </swiper-slide>
     </swiper>
   </main>
@@ -58,23 +28,18 @@
 <script setup lang="ts">
 import * as zip from "@zip.js/zip.js";
 import { ref } from "vue";
-import type { Ref } from 'vue'
+import type { Ref } from "vue";
 import BaseInputFile from "../src/components/BaseInputFile.vue";
-import BaseLoader from "../src/components/BaseLoader.vue"
-import PersonItem from "../src/components/PersonItem.vue";
+import BaseLoader from "../src/components/BaseLoader.vue";
+import ResultSection from "../src/components/ResultSection.vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
-
-interface Person {
-  id: string,
-  name: string,
-  totalMessages: number,
-}
+import type { Person } from "../types/Person";
 
 const mySwiper: Ref<any> = ref(null);
 const setSwiper = (swiper: any) => {
   mySwiper.value = swiper;
-}
+};
 
 const isLoader = ref(false);
 const isLoaded = ref(false);
@@ -82,15 +47,18 @@ const isLoaded = ref(false);
 const persons: Ref<Array<Person>> = ref([]);
 
 const getFiles = async (files: any) => {
-  if (files.length < 1) return
+  if (files.length < 1) return;
   isLoader.value = true;
+  mySwiper.value.allowSlideNext = false;
+
+  if (persons.value.length > 0) persons.value = [];
   console.log("files", files);
 
   const reader = new FileReader();
   reader.onload = async (event) => {
     const blob = new Blob([event.target?.result!]);
     const reader = new zip.ZipReader(new zip.BlobReader(blob));
-    let entries = await reader.getEntries() || [];
+    let entries = (await reader.getEntries()) || [];
 
     // entry filter
     entries = entries.filter((item: any) => {
@@ -104,8 +72,7 @@ const getFiles = async (files: any) => {
 
       if (folderName.length >= 2) {
         folderName = folderName[1];
-        return folderName === "inbox"
-          || folderName === "archived_threads";
+        return folderName === "inbox" || folderName === "archived_threads";
       }
     });
 
@@ -113,7 +80,9 @@ const getFiles = async (files: any) => {
       const json = JSON.parse(await entry.getData?.(new zip.TextWriter())!);
       const userFolderName = entry.filename.split("/")[2];
 
-      const index = persons.value.findIndex((item: Person) => item.id === userFolderName);
+      const index = persons.value.findIndex(
+        (item: Person) => item.id === userFolderName
+      );
       if (index > -1) {
         persons.value[index].totalMessages += json.messages.length;
       } else {
@@ -121,23 +90,31 @@ const getFiles = async (files: any) => {
           id: userFolderName,
           name: json.title,
           totalMessages: json.messages.length,
-        }
+        };
 
-        persons.value.push(person)
+        persons.value.push(person);
       }
     }
 
-    persons.value.sort((a: Person, b: Person) => b.totalMessages - a.totalMessages);
+    persons.value.sort(
+      (a: Person, b: Person) => b.totalMessages - a.totalMessages
+    );
     persons.value = persons.value.splice(0, 100);
 
-    console.log("pers", persons.value)
+    console.log("pers", persons.value);
 
     await reader.close();
     isLoaded.value = true;
+    mySwiper.value.allowSlideNext = true;
   };
 
   reader.readAsArrayBuffer(files[0]);
-}; 
+};
+
+const resetFileSection = () => {
+  isLoader.value = false;
+  isLoaded.value = false;
+};
 </script>
 <style>
 .fade-enter-active,
