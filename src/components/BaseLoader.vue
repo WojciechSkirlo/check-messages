@@ -1,7 +1,7 @@
 <template>
   <div class="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-white">
     <div class="flex flex-col items-center mb-12">
-      <div class="flex items-center justify-center w-48 h-48 bg-black rounded-full bg-opacity-5"
+      <div class="flex items-center justify-center w-48 h-48 transform bg-black rounded-full bg-opacity-5"
         :class="!isLoaded ? 'animate-pulse-slow': 'animate-pulse-slow-one'">
         <div class="flex items-center justify-center bg-black rounded-full w-36 h-36 bg-opacity-10">
           <div class="flex items-center justify-center w-24 h-24 transition-all duration-1000 bg-black rounded-full"
@@ -25,9 +25,12 @@
         </button>
       </Transition>
     </div>
+    <BaseConfetti v-if="isLoaded" />
   </div>
 </template>
 <script setup lang="ts">
+import BaseConfetti from "../components/BaseConfetti.vue"
+
 defineEmits<{
   (e: "checkResults"): void,
 }>()

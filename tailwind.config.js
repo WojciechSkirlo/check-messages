@@ -45,14 +45,14 @@ module.exports = {
     },
     extend: {
       animation: {
-        "pulse-slow": "pulse-slow 1.6s ease infinite",
-        "pulse-slow-one": "pulse-slow-one 1s ease",
-        "pulse-color": "pulse-color 1.6s ease infinite",
+        "pulse-slow": "pulse-slow 1.5s ease infinite",
+        "pulse-slow-one": "pulse-slow-one 0.5s ease",
+        "pulse-color": "pulse-color 1.5s ease infinite",
       },
       keyframes: {
         "pulse-slow": {
-          "0%, 100%": { transform: "scale(0.9)" },
-          "50%": { transform: "scale(1.1)" },
+          "0%, 100%": { transform: "scale(0.85)" },
+          "50%": { transform: "scale(1.05)" },
         },
 
         "pulse-slow-one": {

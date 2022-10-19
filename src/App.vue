@@ -1,12 +1,14 @@
 <template>
-  <main class="w-full  bg-white md:max-w-[390px]  md:border md:border-black">
-    <swiper class="w-full h-full mySwiper" @swiper="setSwiper">
+  <main class="w-full bg-white md:max-w-[390px]  md:border md:border-black">
+    <swiper class="w-full h-full mySwiper" @swiper="setSwiper"
+      @slide-change-transition-end="isLoader = false; isLoaded = false;">
       <swiper-slide class="w-full h-screen md:h-[820px]">
         <!-- File page -->
-        <div @click="test">test</div>
-        <div class="relative w-full h-full p-8 text-center">
-          <BaseInputFile @update:model-value="getFiles" />
-        </div>
+        <Transition name="fade">
+          <div class="relative w-full h-full p-8 text-center">
+            <BaseInputFile v-if="!isLoader" @update:model-value="getFiles" />
+          </div>
+        </Transition>
         <Transition name="fade">
           <BaseLoader v-if="isLoader" :is-loaded="isLoaded" @check-results="mySwiper.slideNext()" />
         </Transition>
@@ -25,7 +27,7 @@
                     fill="#101010" />
                 </svg>
               </button>
-              <h2 class="text-lg font-semibold first-letter:uppercase">messenger top 100</h2>
+              <h2 class="text-lg font-semibold first-letter:uppercase">messenger</h2>
               <div class="h-9 w-9"></div>
             </div>
 
@@ -44,6 +46,8 @@
           <!-- Results -->
           <div class="flex flex-col gap-y-3">
             <PersonItem v-for="(item, index) in persons" :item="item" :index="index" :key="item.id" />
+            <p v-if="!persons.length" class="px-8 text-sm text-gray-300 first-letter:uppercase">There is no results :/
+            </p>
           </div>
         </div>
       </swiper-slide>
@@ -75,16 +79,14 @@ const setSwiper = (swiper: any) => {
 const isLoader = ref(false);
 const isLoaded = ref(false);
 
-const isFilePage = ref(true);
 const persons: Ref<Array<Person>> = ref([]);
 
 const getFiles = async (files: any) => {
   if (files.length < 1) return
   isLoader.value = true;
-  const reader = new FileReader();
-
   console.log("files", files);
 
+  const reader = new FileReader();
   reader.onload = async (event) => {
     const blob = new Blob([event.target?.result!]);
     const reader = new zip.ZipReader(new zip.BlobReader(blob));
@@ -107,7 +109,6 @@ const getFiles = async (files: any) => {
       }
     });
 
-
     for (const entry of entries) {
       const json = JSON.parse(await entry.getData?.(new zip.TextWriter())!);
       const userFolderName = entry.filename.split("/")[2];
@@ -128,22 +129,15 @@ const getFiles = async (files: any) => {
 
     persons.value.sort((a: Person, b: Person) => b.totalMessages - a.totalMessages);
     persons.value = persons.value.splice(0, 100);
-    isFilePage.value = false;
+
     console.log("pers", persons.value)
 
     await reader.close();
-    setTimeout(() => {
-      isLoaded.value = true;
-    }, 1000)
     isLoaded.value = true;
   };
 
   reader.readAsArrayBuffer(files[0]);
-};
-
-function test() {
-  console.log("moze conffetti")
-} 
+}; 
 </script>
 <style>
 .fade-enter-active,
