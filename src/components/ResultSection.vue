@@ -49,7 +49,8 @@ const vSearch: Ref<string> = ref("");
 
 const filtredPerson = computed<Array<Person>>(() => {
   return props.persons.filter((item: Person) => {
-    return item.name.toLowerCase().includes(vSearch.value.toLowerCase());
+    let vSearchFormatted = vSearch.value.toLowerCase();
+    return item.name.toLowerCase().includes(vSearchFormatted) || String(item.totalMessages).toLowerCase().includes(vSearchFormatted) || String(item.ranking).toLowerCase().includes(vSearchFormatted);
   })
 })
 
