@@ -11,3 +11,23 @@
 #app {
   @apply flex justify-center min-h-screen md:items-center md:p-8;
 }
+
+/* width */
+/* ::-webkit-scrollbar {
+  @apply w-3.5;
+} */
+
+/* Track */
+::-webkit-scrollbar-track {
+  /* @apply bg-gray-100; */
+}
+ 
+/* Handle */
+/* ::-webkit-scrollbar-thumb {
+  @apply bg-gray-300;
+} */
+
+/* Handle on hover */
+/* ::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-300;
+} */

@@ -29,12 +29,12 @@
 import * as zip from "@zip.js/zip.js";
 import { ref } from "vue";
 import type { Ref } from "vue";
+import type { Person } from "../types/Person";
 import BaseInputFile from "../src/components/BaseInputFile.vue";
 import BaseLoader from "../src/components/BaseLoader.vue";
 import ResultSection from "../src/components/ResultSection.vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
-import type { Person } from "../types/Person";
 
 const mySwiper: Ref<any> = ref(null);
 const setSwiper = (swiper: any) => {
@@ -88,18 +88,18 @@ const getFiles = async (files: any) => {
       } else {
         const person: Person = {
           id: userFolderName,
-          name: json.title,
+          name: decodeText(json.title),
           totalMessages: json.messages.length,
+          ranking: 0,
         };
 
         persons.value.push(person);
       }
     }
 
-    persons.value.sort(
-      (a: Person, b: Person) => b.totalMessages - a.totalMessages
-    );
+    persons.value.sort((a: Person, b: Person) => b.totalMessages - a.totalMessages);
     persons.value = persons.value.splice(0, 100);
+    persons.value = persons.value.map((item: Person, index: number) => ({ ...item, ranking: index + 1 }))
 
     console.log("pers", persons.value);
 
@@ -110,6 +110,11 @@ const getFiles = async (files: any) => {
 
   reader.readAsArrayBuffer(files[0]);
 };
+
+const decodeText = (string: string) =>
+  new TextDecoder().decode(
+    new Uint8Array(string.split("").map((r: any) => r.charCodeAt()))
+  );
 
 const resetFileSection = () => {
   isLoader.value = false;

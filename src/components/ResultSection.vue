@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full h-full py-8 overflow-auto">
+  <div class="flex flex-col w-full h-full py-8 overflow-y-auto">
     <div class="flex flex-col px-6">
       <!-- Navigation -->
       <div class="flex items-center justify-between w-full mb-8 gap-x-6">
@@ -15,35 +15,47 @@
         <div class="h-9 w-9"></div>
       </div>
 
-      <!-- Input -->
-      <div class="flex items-center w-full gap-4 px-6 py-4.5 mb-6 border border-gray-100 rounded-xl">
-        <input type="text" placeholder="Search user"
-          class="flex-1 order-1 text-sm outline-none peer placeholder:text-gray-200" />
-        <svg width="11" height="11" viewBox="0 0 11 11" fill="#00ffff" xmlns="http://www.w3.org/2000/svg"
-          class="transition-colors duration-300 peer-focus:fill-black fill-gray-200">
-          <path
-            d="M4.70412 9.40774C5.74783 9.40753 6.76147 9.05814 7.58363 8.41522L10.1685 11L11 10.1686L8.41508 7.58381C9.05837 6.76162 9.40799 5.7478 9.40824 4.70387C9.40824 2.11027 7.29786 0 4.70412 0C2.11039 0 0 2.11027 0 4.70387C0 7.29747 2.11039 9.40774 4.70412 9.40774ZM4.70412 1.17597C6.64986 1.17597 8.23221 2.75823 8.23221 4.70387C8.23221 6.64951 6.64986 8.23177 4.70412 8.23177C2.75838 8.23177 1.17603 6.64951 1.17603 4.70387C1.17603 2.75823 2.75838 1.17597 4.70412 1.17597Z" />
-        </svg>
-      </div>
+      <!-- Input search -->
+      <BaseInputSearch v-model="vSearch" />
     </div>
 
     <!-- Results -->
     <div class="flex flex-col gap-y-3">
-      <PersonItem v-for="(item, index) in persons" :item="item" :index="index" :key="item.id" />
-      <p v-if="!persons.length" class="px-8 text-sm text-gray-300 first-letter:uppercase">
+      <PersonItem v-for="item in filtredPerson" :item="item" :key="item.id" />
+      <p v-if="!filtredPerson.length" class="px-8 text-sm text-gray-300 first-letter:uppercase">
         There is no results :/
       </p>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+import type { Ref } from "vue";
 import type { Person } from "../../types/Person";
 import PersonItem from "../../src/components/PersonItem.vue";
+import BaseInputSearch from "../../src/components/BaseInputSearch.vue"
+// import Scrollbar from 'smooth-scrollbar';
+// import { ScrollbarPlugin } from 'smooth-scrollbar';
+
 defineEmits<{
   (e: "slidePrev"): void;
 }>();
 
-defineProps<{
+const props = defineProps<{
   persons: Array<Person>;
 }>();
+
+const vSearch: Ref<string> = ref("");
+
+const filtredPerson = computed<Array<Person>>(() => {
+  return props.persons.filter((item: Person) => {
+    let vSearchFormatted = vSearch.value.toLowerCase();
+    return item.name.toLowerCase().includes(vSearchFormatted) || String(item.totalMessages).toLowerCase().includes(vSearchFormatted) || String(item.ranking).toLowerCase().includes(vSearchFormatted);
+  })
+})
+
+// onMounted(() => {
+//   // Scrollbar.use(ScrollbarPlugin)
+//   Scrollbar.initAll()
+// })
 </script>
