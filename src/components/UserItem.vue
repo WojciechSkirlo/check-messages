@@ -41,7 +41,7 @@
   </li>
 </template>
 <script setup lang="ts">
-import type { User } from "../../types/User";
+import type { User } from "../../types/index";
 
 defineProps<{
   item: User;

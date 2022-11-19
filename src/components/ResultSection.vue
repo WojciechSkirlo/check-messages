@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { Ref } from "vue";
-import type { User } from "../../types/User";
+import type { User } from "../../types/index";
 import UserItem from "./UserItem.vue";
 import BaseInputSearch from "../../src/components/BaseInputSearch.vue";
 

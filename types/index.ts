@@ -14,3 +14,8 @@ export interface User {
   ranking: number;
   info: Info;
 }
+
+export interface Validation {
+  is: boolean | null;
+  message: string;
+}
