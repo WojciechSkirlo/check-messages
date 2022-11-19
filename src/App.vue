@@ -1,11 +1,17 @@
 <template>
   <main class="w-full bg-white md:max-w-[390px] md:border md:border-black">
-    <swiper class="w-full h-full mySwiper" @swiper="setSwiper" @slide-change-transition-end="resetFileSection">
-      <swiper-slide class="w-full h-screen md:h-[820px]">
+    <Swiper
+      class="w-full h-full mySwiper"
+      @swiper="setSwiper"
+      @slide-change-transition-end="resetFileSection"
+    >
+      <SwiperSlide class="w-full h-screen md:h-[820px]">
         <div class="flex flex-col w-full h-full py-8">
           <div class="flex flex-col px-6">
             <div class="flex items-center justify-center w-full mb-8 gap-x-6">
-              <h2 class="text-lg font-semibold first-letter:uppercase">messages</h2>
+              <h2 class="text-lg font-semibold first-letter:uppercase">
+                messages
+              </h2>
             </div>
           </div>
           <Transition name="fade">
@@ -14,14 +20,18 @@
             </div>
           </Transition>
           <Transition name="fade">
-            <BaseLoader v-if="isLoader" :is-loaded="isLoaded" @check-results="mySwiper.slideNext()" />
+            <BaseLoader
+              v-if="isLoader"
+              :is-loaded="isLoaded"
+              @check-results="mySwiper.slideNext()"
+            />
           </Transition>
         </div>
-      </swiper-slide>
-      <swiper-slide class="w-full h-screen md:h-[820px]">
-        <ResultSection :persons="persons" @slide-prev="mySwiper.slidePrev()" />
-      </swiper-slide>
-    </swiper>
+      </SwiperSlide>
+      <SwiperSlide class="w-full h-screen md:h-[820px]">
+        <ResultSection :users="users" @slide-prev="mySwiper.slidePrev()" />
+      </SwiperSlide>
+    </Swiper>
   </main>
 </template>
 
@@ -29,7 +39,7 @@
 import * as zip from "@zip.js/zip.js";
 import { ref } from "vue";
 import type { Ref } from "vue";
-import type { Person } from "../types/Person";
+import type { User } from "../types/User";
 import BaseInputFile from "../src/components/BaseInputFile.vue";
 import BaseLoader from "../src/components/BaseLoader.vue";
 import ResultSection from "../src/components/ResultSection.vue";
@@ -44,14 +54,14 @@ const setSwiper = (swiper: any) => {
 const isLoader = ref(false);
 const isLoaded = ref(false);
 
-const persons: Ref<Array<Person>> = ref([]);
+const users: Ref<Array<User>> = ref([]);
 
 const getFiles = async (files: any) => {
   if (files.length < 1) return;
   isLoader.value = true;
   mySwiper.value.allowSlideNext = false;
 
-  if (persons.value.length > 0) persons.value = [];
+  if (users.value.length > 0) users.value = [];
   console.log("files", files);
 
   const reader = new FileReader();
@@ -80,28 +90,40 @@ const getFiles = async (files: any) => {
       const json = JSON.parse(await entry.getData?.(new zip.TextWriter())!);
       const userFolderName = entry.filename.split("/")[2];
 
-      const index = persons.value.findIndex(
-        (item: Person) => item.id === userFolderName
+      const index = users.value.findIndex(
+        (item: User) => item.id === userFolderName
       );
+
       if (index > -1) {
-        persons.value[index].totalMessages += json.messages.length;
+        users.value[index].info.totalMessages += json.messages.length;
       } else {
-        const person: Person = {
+        const user: User = {
           id: userFolderName,
           name: decodeText(json.title),
-          totalMessages: json.messages.length,
           ranking: 0,
+          info: {
+            totalMessages: json.messages.length,
+            isGroup: json.thread_type === "RegularGroup",
+            yourMessages: 0,
+          },
         };
 
-        persons.value.push(person);
+        console.log("json", json);
+
+        users.value.push(user);
       }
     }
 
-    persons.value.sort((a: Person, b: Person) => b.totalMessages - a.totalMessages);
-    persons.value = persons.value.splice(0, 100);
-    persons.value = persons.value.map((item: Person, index: number) => ({ ...item, ranking: index + 1 }))
+    users.value.sort(
+      (a: User, b: User) => b.info.totalMessages - a.info.totalMessages
+    );
+    users.value = users.value.splice(0, 100);
+    users.value = users.value.map((item: User, index: number) => ({
+      ...item,
+      ranking: index + 1,
+    }));
 
-    console.log("pers", persons.value);
+    console.log("pers", users.value);
 
     await reader.close();
     isLoaded.value = true;
