@@ -28,13 +28,67 @@
             <BaseLoader
               v-if="isLoader"
               :is-loaded="isLoaded"
-              @check-results="mySwiper.slideNext()"
+              @check-results="mySwiper!.slideNext()"
             />
           </Transition>
         </div>
       </SwiperSlide>
       <SwiperSlide class="w-full h-screen md:h-[820px]">
-        <ResultSection :users="users" @slide-prev="mySwiper.slidePrev()" />
+        <ResultSection
+          :users="users"
+          @slide-prev="mySwiper!.slidePrev()"
+          @show-user="showUser"
+        />
+      </SwiperSlide>
+      <SwiperSlide
+        v-if="selectedUser !== null"
+        class="w-full h-screen md:h-[820px]"
+      >
+        <div class="flex flex-col w-full h-full py-8 overflow-y-auto">
+          <div class="flex flex-col px-6">
+            <!-- Navigation -->
+            <div class="flex items-center justify-between w-full mb-8 gap-x-6">
+              <button
+                class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl"
+                @click="$emit('slidePrev')"
+              >
+                <BaseIcon
+                  name="ChevronLeftIcon"
+                  class="transition-colors duration-300"
+                />
+              </button>
+              <h2 class="text-lg font-semibold first-letter:uppercase">
+                messages
+              </h2>
+              <div class="h-9 w-9"></div>
+            </div>
+
+            <!-- Input search -->
+            <!-- <BaseInputSearch v-model="vSearch" /> -->
+          </div>
+
+          <!-- Results -->
+          <!-- <ul class="flex flex-col overflow-x-hidden gap-y-3">
+            <UserItem
+              v-for="user in filtredUsers"
+              :item="user"
+              :key="user.id"
+              @click="$emit('showUser', user)"
+            />
+            <li
+              v-if="!filtredUsers.length"
+              class="px-8 text-sm text-gray-300 first-letter:uppercase"
+            >
+              There is no results :/
+            </li>
+          </ul> -->
+        </div>
+        {{ selectedUser }}
+        <!-- <ResultSection
+          :users="users"
+          @slide-prev="mySwiper!.slidePrev()"
+          @show-user="showUser"
+        /> -->
       </SwiperSlide>
     </Swiper>
   </main>
@@ -47,11 +101,10 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
 import type { Ref } from "vue";
 import type { User, Validation } from "../types/index";
-import BaseInputFile from "../src/components/BaseInputFile.vue";
-import BaseLoader from "../src/components/BaseLoader.vue";
+import type { Swiper as SwiperType } from "swiper/types";
 import ResultSection from "../src/components/ResultSection.vue";
 
-const mySwiper: Ref<any> = ref(null);
+const mySwiper: Ref<SwiperType | null> = ref(null);
 const setSwiper = (swiper: any) => {
   mySwiper.value = swiper;
 };
@@ -60,6 +113,7 @@ const vFiles = ref<FileList | null>();
 const isLoader = ref(false);
 const isLoaded = ref(false);
 
+const selectedUser = ref<User | null>(null);
 const users: Ref<Array<User>> = ref([]);
 
 const validationFiles = ref<Validation>({
@@ -71,20 +125,20 @@ const loadingUser = (state: "start" | "loaded" | "error") => {
   if (state === "start") {
     [
       isLoader.value,
-      mySwiper.value.allowSlideNext,
-      mySwiper.value.allowSlidePrev,
+      mySwiper.value!.allowSlideNext,
+      mySwiper.value!.allowSlidePrev,
     ] = [true, false, false];
   } else if (state === "loaded") {
     [
       isLoaded.value,
-      mySwiper.value.allowSlideNext,
-      mySwiper.value.allowSlidePrev,
+      mySwiper.value!.allowSlideNext,
+      mySwiper.value!.allowSlidePrev,
     ] = [true, true, true];
   } else {
     [
       isLoader.value,
-      mySwiper.value.allowSlideNext,
-      mySwiper.value.allowSlidePrev,
+      mySwiper.value!.allowSlideNext,
+      mySwiper.value!.allowSlidePrev,
     ] = [false, true, true];
 
     validationFiles.value = {
@@ -125,8 +179,9 @@ const getFiles = async (files: FileList) => {
   }
 
   sortAndMapUsers();
-
   users.value.length > 0 ? loadingUser("loaded") : loadingUser("error");
+
+  console.log("users", users.value);
 };
 
 const getDataFile = async (file: File) => {
@@ -214,6 +269,13 @@ const resetLoader = () => {
   isLoader.value = false;
   isLoaded.value = false;
   vFiles.value = null;
+};
+
+const showUser = (user: User) => {
+  selectedUser.value = user;
+  setTimeout(() => {
+    mySwiper.value?.slideTo(2);
+  }, 200);
 };
 </script>
 <style>

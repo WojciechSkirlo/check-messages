@@ -51,11 +51,11 @@
         </button>
       </Transition>
     </div>
-    <BaseConfetti v-if="isLoaded" />
+    <TheConfetti v-if="isLoaded" />
   </div>
 </template>
 <script setup lang="ts">
-import BaseConfetti from "../components/BaseConfetti.vue";
+import TheConfetti from "../the/Confetti.vue";
 
 defineEmits<{
   (e: "checkResults"): void;

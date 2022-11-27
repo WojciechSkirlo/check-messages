@@ -4,7 +4,7 @@
       <label for="input-file" class="flex items-center text-sm gap-x-4">
         <div
           type="button"
-          class="px-6 py-3 font-semibold text-white bg-black rounded-full shrink-0"
+          class="px-6 py-3 font-semibold text-white bg-black rounded-full cursor-pointer shrink-0"
         >
           Select files
         </div>
@@ -33,7 +33,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
-import type { Validation } from "../../types/index";
+import type { Validation } from "../../../types/index";
 
 defineEmits<{
   (e: "update:modelValue", value: any): void;
