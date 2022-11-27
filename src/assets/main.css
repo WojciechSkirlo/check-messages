@@ -13,21 +13,21 @@
 }
 
 /* width */
-/* ::-webkit-scrollbar {
-  @apply w-3.5;
-} */
+::-webkit-scrollbar {
+  @apply md:w-3.5;
+}
 
 /* Track */
 ::-webkit-scrollbar-track {
-  /* @apply bg-gray-100; */
+  @apply md:bg-gray-50;
 }
  
 /* Handle */
-/* ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300;
-} */
+::-webkit-scrollbar-thumb {
+  @apply md:bg-gray-300;
+}
 
 /* Handle on hover */
-/* ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-300;
-} */
+::-webkit-scrollbar-thumb:hover {
+  @apply md:bg-gray-300;
+}

@@ -11,6 +11,7 @@ module.exports = {
       4: "10px",
       4.5: "12.5px",
       5: "15px",
+      5.5: "17.5px",
       6: "20px",
       7: "25px",
       8: "30px",
@@ -26,6 +27,7 @@ module.exports = {
     colors: {
       black: "#000000",
       white: "#ffffff",
+      error: "#ef4444",
       gray: {
         50: "#f3f4f6",
         100: "#e7e7e7",

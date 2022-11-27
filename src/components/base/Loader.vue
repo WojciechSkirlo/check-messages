@@ -35,7 +35,9 @@
       <div class="flex flex-col items-center">
         <h3
           class="font-semibold text-center mt-14 first-letter:uppercase"
-          v-text="isLoaded ? 'we succeeded!' : 'loading...'"
+          v-text="
+            isLoaded ? 'we succeeded!' : 'loading... (it may take some time)'
+          "
         ></h3>
       </div>
       <Transition name="fade">
@@ -49,15 +51,16 @@
         </button>
       </Transition>
     </div>
-    <BaseConfetti v-if="isLoaded" />
+    <TheConfetti v-if="isLoaded" />
   </div>
 </template>
 <script setup lang="ts">
-import BaseConfetti from "../components/BaseConfetti.vue";
+import TheConfetti from "../the/Confetti.vue";
 
 defineEmits<{
   (e: "checkResults"): void;
 }>();
+
 defineProps<{
   isLoaded: boolean;
 }>();

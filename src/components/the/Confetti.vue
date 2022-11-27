@@ -7,8 +7,9 @@
 </template>
 <script setup lang="ts">
 import { loadFull } from "tsparticles";
+import type { Engine } from "tsparticles-engine";
 
-const optionsParticles: any = {
+const optionsParticles = {
   fullScreen: {
     zIndex: 1,
   },
@@ -143,7 +144,7 @@ const optionsParticles: any = {
   },
 };
 
-const particlesInit = async (engine: any) => {
+const particlesInit = async (engine: Engine) => {
   await loadFull(engine);
 };
 </script>
