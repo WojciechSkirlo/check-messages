@@ -8,11 +8,16 @@
     >
       <img
         v-if="!item.info.isGroup"
-        src="user.png"
+        src="/user.png"
         alt="User"
         class="w-5.5 h-5.5 invert"
       />
-      <img v-else src="user-group.png" alt="Group" class="w-5.5 h-5.5 invert" />
+      <img
+        v-else
+        src="/user-group.png"
+        alt="Group"
+        class="w-5.5 h-5.5 invert"
+      />
     </div>
     <div class="flex flex-col w-[calc(100%-70px)]">
       <div class="flex items-center justify-between w-full gap-x-5">
