@@ -1,10 +1,11 @@
 interface Info {
   isGroup: boolean;
   totalMessages: number;
-  yourMessages?: number;
-  dates?: {
-    firstMessage: string;
-    lastMessage: string;
+  yourMessages: number;
+  whoStartConversation: string;
+  dates: {
+    timestampFirstMessage: number;
+    timestampLastMessage: number;
   };
 }
 

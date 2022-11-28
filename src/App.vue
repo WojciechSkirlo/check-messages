@@ -1,94 +1,28 @@
 <template>
   <main class="w-full bg-white md:max-w-[390px] md:border md:border-black">
-    <Swiper
-      class="w-full h-full mySwiper"
-      @swiper="setSwiper"
-      @slide-change-transition-end="resetLoader"
-    >
+    <Swiper class="w-full h-full mySwiper" @swiper="setSwiper" @slide-change-transition-end="resetLoader">
       <SwiperSlide class="w-full h-screen md:h-[820px]">
         <div class="flex flex-col w-full h-full py-8">
           <div class="flex flex-col px-6">
             <div class="flex items-center justify-center w-full mb-8 gap-x-6">
-              <h2 class="text-lg font-semibold first-letter:uppercase">
-                messages
-              </h2>
+              <h2 class="text-lg font-semibold first-letter:uppercase">messages</h2>
             </div>
           </div>
           <Transition name="fade">
             <div class="relative w-full h-full p-8 text-center">
-              <BaseInputFile
-                v-if="!isLoader"
-                :model-value="vFiles!"
-                :validation="validationFiles"
-                @update:model-value="getFiles"
-              />
+              <BaseInputFile v-if="!isLoader" :model-value="vFiles!" :validation="validationFiles" @update:model-value="getFiles" />
             </div>
           </Transition>
           <Transition name="fade">
-            <BaseLoader
-              v-if="isLoader"
-              :is-loaded="isLoaded"
-              @check-results="mySwiper!.slideNext()"
-            />
+            <BaseLoader v-if="isLoader" :is-loaded="isLoaded" @check-results="mySwiper?.slideNext()" />
           </Transition>
         </div>
       </SwiperSlide>
       <SwiperSlide class="w-full h-screen md:h-[820px]">
-        <ResultSection
-          :users="users"
-          @slide-prev="mySwiper!.slidePrev()"
-          @show-user="showUser"
-        />
+        <TheUsers :users="users" @slide-prev="mySwiper?.slidePrev()" @show-user="showUser" />
       </SwiperSlide>
-      <SwiperSlide
-        v-if="selectedUser !== null"
-        class="w-full h-screen md:h-[820px]"
-      >
-        <div class="flex flex-col w-full h-full py-8 overflow-y-auto">
-          <div class="flex flex-col px-6">
-            <!-- Navigation -->
-            <div class="flex items-center justify-between w-full mb-8 gap-x-6">
-              <button
-                class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl"
-                @click="$emit('slidePrev')"
-              >
-                <BaseIcon
-                  name="ChevronLeftIcon"
-                  class="transition-colors duration-300"
-                />
-              </button>
-              <h2 class="text-lg font-semibold first-letter:uppercase">
-                messages
-              </h2>
-              <div class="h-9 w-9"></div>
-            </div>
-
-            <!-- Input search -->
-            <!-- <BaseInputSearch v-model="vSearch" /> -->
-          </div>
-
-          <!-- Results -->
-          <!-- <ul class="flex flex-col overflow-x-hidden gap-y-3">
-            <UserItem
-              v-for="user in filtredUsers"
-              :item="user"
-              :key="user.id"
-              @click="$emit('showUser', user)"
-            />
-            <li
-              v-if="!filtredUsers.length"
-              class="px-8 text-sm text-gray-300 first-letter:uppercase"
-            >
-              There is no results :/
-            </li>
-          </ul> -->
-        </div>
-        {{ selectedUser }}
-        <!-- <ResultSection
-          :users="users"
-          @slide-prev="mySwiper!.slidePrev()"
-          @show-user="showUser"
-        /> -->
+      <SwiperSlide v-if="selectedUser !== null" class="w-full h-screen md:h-[820px]">
+        <TheUser :user="selectedUser" @slide-prev="mySwiper?.slidePrev()" />
       </SwiperSlide>
     </Swiper>
   </main>
@@ -102,16 +36,23 @@ import "swiper/css";
 import type { Ref } from "vue";
 import type { User, Validation } from "../types/index";
 import type { Swiper as SwiperType } from "swiper/types";
-import ResultSection from "../src/components/ResultSection.vue";
+import TheUsers from "../src/components/the/Users.vue";
+import TheUser from "./components/the/User.vue";
 
-const mySwiper: Ref<SwiperType | null> = ref(null);
-const setSwiper = (swiper: any) => {
-  mySwiper.value = swiper;
-};
+interface Message {
+  timestamp_ms: number;
+  sender_name: string;
+}
 
-const vFiles = ref<FileList | null>();
+interface JSON {
+  title: string;
+  thread_type: "Regular" | "RegularGroup";
+  messages: Array<Message>;
+}
+
 const isLoader = ref(false);
 const isLoaded = ref(false);
+const vFiles = ref<FileList | null>();
 
 const selectedUser = ref<User | null>(null);
 const users: Ref<Array<User>> = ref([]);
@@ -121,25 +62,19 @@ const validationFiles = ref<Validation>({
   message: "",
 });
 
+const mySwiper: Ref<SwiperType | null> = ref(null);
+
+const setSwiper = (swiper: any) => {
+  mySwiper.value = swiper;
+};
+
 const loadingUser = (state: "start" | "loaded" | "error") => {
   if (state === "start") {
-    [
-      isLoader.value,
-      mySwiper.value!.allowSlideNext,
-      mySwiper.value!.allowSlidePrev,
-    ] = [true, false, false];
+    [isLoader.value, mySwiper.value!.allowSlideNext, mySwiper.value!.allowSlidePrev] = [true, false, false];
   } else if (state === "loaded") {
-    [
-      isLoaded.value,
-      mySwiper.value!.allowSlideNext,
-      mySwiper.value!.allowSlidePrev,
-    ] = [true, true, true];
+    [isLoaded.value, mySwiper.value!.allowSlideNext, mySwiper.value!.allowSlidePrev] = [true, true, true];
   } else {
-    [
-      isLoader.value,
-      mySwiper.value!.allowSlideNext,
-      mySwiper.value!.allowSlidePrev,
-    ] = [false, true, true];
+    [isLoader.value, mySwiper.value!.allowSlideNext, mySwiper.value!.allowSlidePrev] = [false, true, true];
 
     validationFiles.value = {
       is: false,
@@ -152,13 +87,7 @@ const getFiles = async (files: FileList) => {
   vFiles.value = files;
 
   if (files.length < 1) return;
-  if (
-    [...files].some(
-      (item: File) =>
-        item.type !== "application/x-zip-compressed" &&
-        item.type !== "application/zip"
-    )
-  ) {
+  if ([...files].some((item: File) => item.type !== "application/x-zip-compressed" && item.type !== "application/zip")) {
     validationFiles.value = {
       is: false,
       message: "Wrong extension of file. Supported extension: .zip",
@@ -172,12 +101,10 @@ const getFiles = async (files: FileList) => {
   }
 
   loadingUser("start");
-
   if (users.value.length > 0) users.value = [];
-  for (let i = 0; i < files.length; i++) {
-    await getDataFile(files[i]);
+  for (const file of files) {
+    await getDataFile(file);
   }
-
   sortAndMapUsers();
   users.value.length > 0 ? loadingUser("loaded") : loadingUser("error");
 
@@ -185,13 +112,13 @@ const getFiles = async (files: FileList) => {
 };
 
 const getDataFile = async (file: File) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, _) => {
     const reader = new FileReader();
 
     reader.onload = async (event) => {
       const blob = new Blob([event.target?.result!]);
-      const reader = new zip.ZipReader(new zip.BlobReader(blob));
-      let entries = (await reader.getEntries()) || [];
+      const zipReader = new zip.ZipReader(new zip.BlobReader(blob));
+      let entries = (await zipReader.getEntries()) || [];
 
       // entry filter
       entries = entries.filter((item: any) => {
@@ -210,16 +137,26 @@ const getDataFile = async (file: File) => {
       });
 
       for (const entry of entries) {
-        const json = JSON.parse(await entry.getData?.(new zip.TextWriter())!);
+        const json: JSON = JSON.parse(await entry.getData?.(new zip.TextWriter())!);
         const userFolderName = entry.filename.split("/")[2];
 
-        const index = users.value.findIndex(
-          (item: User) => item.id === userFolderName
-        );
+        const index = users.value.findIndex((item: User) => item.id === userFolderName);
+
+        const timestamps = findTimestamps(json.messages.map((item: Message) => item.timestamp_ms));
+        const numberOfYourMessagesInFile = getNumberOfYourMessagesInFile("Wojciech Skir\u00c5\u0082o", json.messages);
+        console.log("number of", numberOfYourMessagesInFile);
 
         if (index > -1) {
           users.value[index].info.totalMessages += json.messages.length;
+          if (timestamps.smallest < users.value[index].info.dates.timestampFirstMessage)
+            users.value[index].info.dates.timestampFirstMessage = timestamps.smallest;
+          if (timestamps.biggest > users.value[index].info.dates.timestampLastMessage)
+            users.value[index].info.dates.timestampLastMessage = timestamps.biggest;
+
+          users.value[index].info.yourMessages += numberOfYourMessagesInFile;
         } else {
+          console.log("timeStamps", timestamps);
+
           const user: User = {
             id: userFolderName,
             name: decodeText(json.title),
@@ -227,20 +164,30 @@ const getDataFile = async (file: File) => {
             info: {
               totalMessages: json.messages.length,
               isGroup: json.thread_type === "RegularGroup",
-              yourMessages: 0,
+              yourMessages: numberOfYourMessagesInFile,
+              whoStartConversation: "Test",
+              dates: {
+                timestampFirstMessage: timestamps.smallest,
+                timestampLastMessage: timestamps.biggest,
+              },
             },
           };
 
           users.value.push(user);
+
+          // console.log(
+          //   "json",
+          //   json.messages[json.messages.length - 1].timestamp_ms
+          // );
         }
       }
 
-      await reader.close();
-      resolve("Loaded");
+      await zipReader.close();
+      resolve(reader.result);
     };
 
     reader.onerror = () => {
-      resolve("Error");
+      resolve(reader.result);
     };
 
     reader.readAsArrayBuffer(file);
@@ -248,9 +195,7 @@ const getDataFile = async (file: File) => {
 };
 
 const sortAndMapUsers = () => {
-  users.value.sort(
-    (a: User, b: User) => b.info.totalMessages - a.info.totalMessages
-  );
+  users.value.sort((a: User, b: User) => b.info.totalMessages - a.info.totalMessages);
 
   users.value = users.value.splice(0, 100);
   users.value = users.value.map((item: User, index: number) => ({
@@ -259,16 +204,39 @@ const sortAndMapUsers = () => {
   }));
 };
 
-const decodeText = (text: string) => {
-  return new TextDecoder().decode(
-    new Uint8Array(text.split("").map((r: any) => r.charCodeAt()))
+/**
+ * Find the smallest timestamp and the biggest timestamp in Array of timestamp
+ * @param {Array<number>} timestamps Array of timestamps
+ */
+const findTimestamps = (timestamps: Array<number>) => {
+  return timestamps.reduce(
+    (acc: { smallest: number; biggest: number }, timestamp: number) => {
+      if (timestamp > acc.biggest) return { ...acc, biggest: timestamp };
+      else if (timestamp < acc.smallest) return { ...acc, smallest: timestamp };
+      else return { ...acc };
+    },
+    { smallest: timestamps[0], biggest: timestamps[0] }
   );
 };
 
-const resetLoader = () => {
-  isLoader.value = false;
-  isLoaded.value = false;
-  vFiles.value = null;
+/**
+ * This function return number of messages given user
+ * @param {Array<Message>} messages Array of message ovject
+ */
+const getNumberOfYourMessagesInFile = (userName: string, messages: Array<Message>) => {
+  return messages.reduce((acc, message) => (message.sender_name === userName ? acc + 1 : acc), 0);
+};
+
+const decodeText = (text: string) => new TextDecoder().decode(new Uint8Array(text.split("").map((r: any) => r.charCodeAt())));
+
+const resetLoader = (swiper: SwiperType) => {
+  if (swiper.activeIndex === 1) {
+    isLoader.value = false;
+    isLoaded.value = false;
+    vFiles.value = null;
+  }
+
+  if (swiper.previousIndex === 2 && selectedUser.value !== null) selectedUser.value = null;
 };
 
 const showUser = (user: User) => {
@@ -278,14 +246,3 @@ const showUser = (user: User) => {
   }, 200);
 };
 </script>
-<style>
-.fade-enter-active,
-.fade-leave-active {
-  @apply transition-opacity duration-500;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  @apply opacity-0;
-}
-</style>

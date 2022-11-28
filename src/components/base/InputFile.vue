@@ -8,7 +8,7 @@
         >
           Select files
         </div>
-        <span class="text-left text-gray-300 truncate w-36">
+        <span class="text-left text-gray-300 truncate max-w-36">
           {{ selectFiles }}
         </span>
       </label>
