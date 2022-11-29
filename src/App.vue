@@ -29,26 +29,15 @@
 </template>
 
 <script setup lang="ts">
+import type { Ref } from "vue";
+import type { User, Validation, JSON, Message } from "../types/index";
+import type { Swiper as SwiperType } from "swiper/types";
 import * as zip from "@zip.js/zip.js";
 import { ref } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
-import type { Ref } from "vue";
-import type { User, Validation } from "../types/index";
-import type { Swiper as SwiperType } from "swiper/types";
 import TheUsers from "../src/components/the/Users.vue";
 import TheUser from "./components/the/User.vue";
-
-interface Message {
-  timestamp_ms: number;
-  sender_name: string;
-}
-
-interface JSON {
-  title: string;
-  thread_type: "Regular" | "RegularGroup";
-  messages: Array<Message>;
-}
 
 const isLoader = ref(false);
 const isLoaded = ref(false);
@@ -141,44 +130,39 @@ const getDataFile = async (file: File) => {
         const userFolderName = entry.filename.split("/")[2];
 
         const index = users.value.findIndex((item: User) => item.id === userFolderName);
-
-        const timestamps = findTimestamps(json.messages.map((item: Message) => item.timestamp_ms));
+        const firstAndLastMessage = findFirstAndLastMessage(json.messages);
         const numberOfYourMessagesInFile = getNumberOfYourMessagesInFile("Wojciech Skir\u00c5\u0082o", json.messages);
-        console.log("number of", numberOfYourMessagesInFile);
 
         if (index > -1) {
           users.value[index].info.totalMessages += json.messages.length;
-          if (timestamps.smallest < users.value[index].info.dates.timestampFirstMessage)
-            users.value[index].info.dates.timestampFirstMessage = timestamps.smallest;
-          if (timestamps.biggest > users.value[index].info.dates.timestampLastMessage)
-            users.value[index].info.dates.timestampLastMessage = timestamps.biggest;
+
+          if (firstAndLastMessage.firstMessage.timestamp_ms < users.value[index].info.firstMessage.timestamp_ms) {
+            users.value[index].info.firstMessage = firstAndLastMessage.firstMessage;
+            // users.value[index].info.firstMessage.timestamp_ms = firstAndLastMessage.firstMessage.timestamp_ms;
+            // users.value[index].info.whoStartConversation = firstAndLastMessage.firstMessage.sender_name;
+            // users.value[index].info.
+          }
+
+          if (firstAndLastMessage.lastMessage.timestamp_ms > users.value[index].info.firstMessage.timestamp_ms) {
+            users.value[index].info.lastMessage = firstAndLastMessage.lastMessage;
+          }
 
           users.value[index].info.yourMessages += numberOfYourMessagesInFile;
         } else {
-          console.log("timeStamps", timestamps);
-
           const user: User = {
             id: userFolderName,
-            name: decodeText(json.title),
-            ranking: 0,
+            name: json.title,
+            ranking: null,
             info: {
               totalMessages: json.messages.length,
               isGroup: json.thread_type === "RegularGroup",
               yourMessages: numberOfYourMessagesInFile,
-              whoStartConversation: "Test",
-              dates: {
-                timestampFirstMessage: timestamps.smallest,
-                timestampLastMessage: timestamps.biggest,
-              },
+              firstMessage: firstAndLastMessage.firstMessage,
+              lastMessage: firstAndLastMessage.lastMessage,
             },
           };
 
           users.value.push(user);
-
-          // console.log(
-          //   "json",
-          //   json.messages[json.messages.length - 1].timestamp_ms
-          // );
         }
       }
 
@@ -194,6 +178,9 @@ const getDataFile = async (file: File) => {
   });
 };
 
+/**
+ * This function sort and map User object
+ */
 const sortAndMapUsers = () => {
   users.value.sort((a: User, b: User) => b.info.totalMessages - a.info.totalMessages);
 
@@ -205,17 +192,17 @@ const sortAndMapUsers = () => {
 };
 
 /**
- * Find the smallest timestamp and the biggest timestamp in Array of timestamp
- * @param {Array<number>} timestamps Array of timestamps
+ * Find the first message and last message in Array<message>
+ * @param {Array<number>} messages Array of messages
  */
-const findTimestamps = (timestamps: Array<number>) => {
-  return timestamps.reduce(
-    (acc: { smallest: number; biggest: number }, timestamp: number) => {
-      if (timestamp > acc.biggest) return { ...acc, biggest: timestamp };
-      else if (timestamp < acc.smallest) return { ...acc, smallest: timestamp };
+const findFirstAndLastMessage = (messages: Array<Message>) => {
+  return messages.reduce(
+    (acc: { firstMessage: Message; lastMessage: Message }, message: Message) => {
+      if (message.timestamp_ms > acc.lastMessage.timestamp_ms) return { ...acc, lastMessage: message };
+      else if (message.timestamp_ms < acc.firstMessage.timestamp_ms) return { ...acc, firstMessage: message };
       else return { ...acc };
     },
-    { smallest: timestamps[0], biggest: timestamps[0] }
+    { firstMessage: messages[0], lastMessage: messages[0] }
   );
 };
 
@@ -226,8 +213,6 @@ const findTimestamps = (timestamps: Array<number>) => {
 const getNumberOfYourMessagesInFile = (userName: string, messages: Array<Message>) => {
   return messages.reduce((acc, message) => (message.sender_name === userName ? acc + 1 : acc), 0);
 };
-
-const decodeText = (text: string) => new TextDecoder().decode(new Uint8Array(text.split("").map((r: any) => r.charCodeAt())));
 
 const resetLoader = (swiper: SwiperType) => {
   if (swiper.activeIndex === 1) {

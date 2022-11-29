@@ -8,7 +8,7 @@
             <BaseIcon name="ChevronLeftIcon" class="transition-colors duration-300" />
           </button>
           <h2 class="text-lg font-semibold text-center truncate first-letter:uppercase">
-            {{ user.name }}
+            {{ $decode(user.name) }}
           </h2>
           <div class="h-9 w-9"></div>
         </div>
@@ -31,16 +31,22 @@
           </span>
           <span class="text-sm text-gray-400">
             Total messages:
-            <b class="ml-2 text-base">{{ user.info.totalMessages }}</b>
+            <b class="ml-2 text-base">{{ user.info?.totalMessages }}</b>
           </span>
           <span class="text-sm text-gray-400">
             Your messages:
-            <b class="ml-2 text-base">{{ user.info.yourMessages }}</b>
+            <b class="ml-2 text-base">{{ user.info?.yourMessages }}</b>
           </span>
           <span class="text-sm text-gray-400">
             Who start the conversation:
             <b class="ml-2 text-base">
-              {{ user.info.whoStartConversation }}
+              {{ $decode(user.info.firstMessage?.sender_name) }}
+            </b>
+          </span>
+          <span v-if="user.info.firstMessage?.content" class="text-sm text-gray-400">
+            Content of first message:
+            <b class="ml-2 text-base">
+              {{ $decode(user.info.firstMessage.content) }}
             </b>
           </span>
           <span class="text-sm text-gray-400">
@@ -74,27 +80,15 @@ const props = defineProps<{
 
 const firstMessageDate = computed(
   () =>
-    `${new Date(props.user.info.dates.timestampFirstMessage).toLocaleDateString("pl")}  ${new Date(
-      props.user.info.dates.timestampFirstMessage
+    `${new Date(props.user.info.firstMessage.timestamp_ms).toLocaleDateString("pl")}  ${new Date(
+      props.user.info.firstMessage.timestamp_ms
     ).toLocaleTimeString("pl")}`
 );
 
 const lastMessageDate = computed(
   () =>
-    `${new Date(props.user.info.dates.timestampLastMessage).toLocaleDateString("pl")}  ${new Date(
-      props.user.info.dates.timestampLastMessage
+    `${new Date(props.user.info.lastMessage.timestamp_ms).toLocaleDateString("pl")}  ${new Date(
+      props.user.info.lastMessage.timestamp_ms
     ).toLocaleTimeString("pl")}`
 );
-
-// const user: User = {
-//   id: "asdasd",
-//   name: "Kamil Palej",
-//   ranking: 1,
-//   info: {
-//     isGroup: false,
-//     totalMessages: 20222,
-//     yourMessages: 0,
-//     dates: { firstMessage: "asd", lastMessage: "asd" },
-//   },
-// };
 </script>
