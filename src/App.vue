@@ -10,7 +10,7 @@
           </div>
           <Transition name="fade">
             <div class="relative w-full h-full p-8 text-center">
-              <BaseInputFile v-if="!isLoader" :model-value="vFiles!" :validation="validationFiles" @update:model-value="getFiles" />
+              <BaseInputFile v-if="!isLoader" :model-value="vFiles" :validation="validationFiles" @update:model-value="getFiles" />
             </div>
           </Transition>
           <Transition name="fade">
@@ -138,9 +138,6 @@ const getDataFile = async (file: File) => {
 
           if (firstAndLastMessage.firstMessage.timestamp_ms < users.value[index].info.firstMessage.timestamp_ms) {
             users.value[index].info.firstMessage = firstAndLastMessage.firstMessage;
-            // users.value[index].info.firstMessage.timestamp_ms = firstAndLastMessage.firstMessage.timestamp_ms;
-            // users.value[index].info.whoStartConversation = firstAndLastMessage.firstMessage.sender_name;
-            // users.value[index].info.
           }
 
           if (firstAndLastMessage.lastMessage.timestamp_ms > users.value[index].info.firstMessage.timestamp_ms) {
