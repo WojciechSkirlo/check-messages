@@ -140,7 +140,7 @@ const getDataFile = async (file: File) => {
             users.value[index].info.firstMessage = firstAndLastMessage.firstMessage;
           }
 
-          if (firstAndLastMessage.lastMessage.timestamp_ms > users.value[index].info.firstMessage.timestamp_ms) {
+          if (firstAndLastMessage.lastMessage.timestamp_ms > users.value[index].info.lastMessage.timestamp_ms) {
             users.value[index].info.lastMessage = firstAndLastMessage.lastMessage;
           }
 
