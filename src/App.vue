@@ -72,7 +72,7 @@ import TheUser from "./components/the/User.vue";
 const isLoader = ref(false);
 const isLoaded = ref(false);
 const isInfo = ref(false);
-const vFiles = ref<FileList | null>();
+const vFiles = ref<FileList | null>(null);
 
 const selectedUser = ref<User | null>(null);
 const users: Ref<Array<User>> = ref([]);
