@@ -1,11 +1,41 @@
 <template>
-  <main class="w-full bg-white md:max-w-[390px] md:border md:border-black">
+  <main class="w-full bg-white md:max-w-[390px] md:border overflow-hidden md:border-black relative">
+    <Transition
+      enter-from-class="-translate-x-full"
+      leave-to-class="-translate-x-full"
+      enter-active-class="duration-300 transition-translate"
+      leave-active-class="duration-300 transition-translate"
+    >
+      <div v-if="isInfo" class="absolute top-0 left-0 z-10 flex flex-col w-full h-full px-6 py-8 bg-white">
+        <div class="flex items-center justify-between w-full mb-8 gap-x-6">
+          <div class="h-9 w-9"></div>
+          <h2 class="text-lg font-semibold first-letter:uppercase">Outboarding</h2>
+          <button class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl" @click="isInfo = false">
+            <BaseIcon name="XMarkIcon" class="transition-colors duration-300" />
+          </button>
+        </div>
+        <div class="flex flex-col justify-between flex-1 gap-6 px-4 py-14 text-md">
+          <div class="grid grid-cols-1 gap-6">
+            <p>
+              If you want to know your messenger statistics you are in the right place. Yeah, you can check how many messages you exchanged with your
+              friends.
+            </p>
+            <p>Before you see your stats, you have to do a few things.</p>
+          </div>
+          <BaseButton @click="isInfo = false">Understand</BaseButton>
+        </div>
+      </div>
+    </Transition>
     <Swiper class="w-full h-full mySwiper" @swiper="setSwiper" @slide-change-transition-end="resetLoader">
       <SwiperSlide class="w-full h-screen md:h-[820px]">
         <div class="flex flex-col w-full h-full py-8">
           <div class="flex flex-col px-6">
-            <div class="flex items-center justify-center w-full mb-8 gap-x-6">
+            <div class="flex items-center justify-between w-full mb-8 gap-x-6">
+              <div class="h-9 w-9"></div>
               <h2 class="text-lg font-semibold first-letter:uppercase">messages</h2>
+              <button class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl" @click="isInfo = true">
+                <BaseIcon name="QuestionMarkCircleIcon" class="transition-colors duration-300" />
+              </button>
             </div>
           </div>
           <Transition name="fade">
@@ -41,6 +71,7 @@ import TheUser from "./components/the/User.vue";
 
 const isLoader = ref(false);
 const isLoaded = ref(false);
+const isInfo = ref(false);
 const vFiles = ref<FileList | null>();
 
 const selectedUser = ref<User | null>(null);
