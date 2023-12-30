@@ -1,25 +1,29 @@
-# check-messages
+# mCheck
 
-This template should help get you started developing with Vue 3 in Vite.
+Hi! maybe you wanted to know, how many messages you exchanged with your friend.
+I was curious and decided to create an application that let us know that thing.
 
-## Recommended IDE Setup
+What you can check:
+- Ranking of 100 people which you wrote the most,
+- How many messages you wrote to your friend,
+- First message date and content,
+- Last message date,
+- Who started the conversation
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+## Instructions
+1. Click account in the top right of Facebook.
+2. Select **Settings & privacy**, then click **Settings**.
+3. In the left column, click **Your Facebook information**.
+4. Next to **Download profile information**, click **View**. ![image](https://github.com/WojciechSkirlo/check-messages/assets/34141085/e7191b35-52af-4086-8d0e-4264269d3893)
+5. Click **Request a download**.
+6. Select the profiles you’d like to download information from.
+7. Click **Next**.
+8. Choose **Select types of information**
+9. Select the **Messages**. ![image](https://github.com/WojciechSkirlo/check-messages/assets/34141085/ea2919c3-016c-4f13-b33d-3592ee737d16)
+10. Click **Next**.
+11. Choose **Data range** *All time* and **Format** *JSON* ![image](https://github.com/WojciechSkirlo/check-messages/assets/34141085/14e10e1b-6627-4b01-ace8-7bd296677801)
+12. Click **Submit request**.
+13. Now we have to wait for the data ![image](https://github.com/WojciechSkirlo/check-messages/assets/34141085/483046df-f16d-4b4f-ba69-4ec7e4af8898)
 
 ## Project Setup
 
