@@ -21,6 +21,7 @@
     </ul>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { User } from "../../../types/index";

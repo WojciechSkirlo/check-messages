@@ -3,7 +3,7 @@
     <div class="flex flex-col">
       <label for="input-file" class="flex items-center text-sm gap-x-4">
         <div type="button" class="px-6 py-3 font-semibold text-white bg-black rounded-full cursor-pointer shrink-0">Select files</div>
-        <span class="text-left text-gray-300 truncate max-w-36">
+        <span class="max-w-[200px] text-left text-gray-300 truncate">
           {{ selectFiles }}
         </span>
       </label>
@@ -21,6 +21,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { computed } from "vue";
 import type { Validation } from "../../../types/index";

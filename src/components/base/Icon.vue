@@ -12,6 +12,7 @@
     "
   ></component>
 </template>
+
 <script setup lang="ts">
 import * as HeroIcons from "@heroicons/vue/24/solid/index.js";
 

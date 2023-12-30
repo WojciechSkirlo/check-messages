@@ -5,6 +5,7 @@
     :options="optionsParticles"
   />
 </template>
+
 <script setup lang="ts">
 import { loadFull } from "tsparticles";
 import type { Engine } from "tsparticles-engine";

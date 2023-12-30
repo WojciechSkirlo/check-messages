@@ -33,6 +33,7 @@
     <TheConfetti v-if="isLoaded" />
   </div>
 </template>
+
 <script setup lang="ts">
 import TheConfetti from "../the/Confetti.vue";
 

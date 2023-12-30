@@ -28,6 +28,7 @@
     </div>
   </li>
 </template>
+
 <script setup lang="ts">
 import type { User } from "../../types/index";
 
