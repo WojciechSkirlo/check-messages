@@ -1,7 +1,6 @@
 interface Info {
   isGroup: boolean;
   totalMessages: number;
-  yourMessages: number;
   firstMessage: Message;
   lastMessage: Message;
 }
