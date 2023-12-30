@@ -34,10 +34,6 @@
             <b class="ml-2 text-base">{{ user.info?.totalMessages }}</b>
           </span>
           <span class="text-sm text-gray-400">
-            Your messages:
-            <b class="ml-2 text-base">{{ user.info?.yourMessages }}</b>
-          </span>
-          <span class="text-sm text-gray-400">
             Who wrote the first message:
             <b class="ml-2 text-base">
               {{ $decode(user.info.firstMessage?.sender_name) }}

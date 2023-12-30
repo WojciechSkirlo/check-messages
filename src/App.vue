@@ -14,13 +14,16 @@
             <BaseIcon name="XMarkIcon" class="transition-colors duration-300" />
           </button>
         </div>
-        <div class="flex flex-col justify-between flex-1 gap-6 px-4 py-14 text-md">
-          <div class="grid grid-cols-1 gap-6">
+        <div class="flex flex-col justify-between flex-1 gap-6 px-4 pt-2 pb-18 text-md">
+          <div class="grid grid-cols-1 gap-5">
             <p>
               If you want to know your messenger statistics you are in the right place. Yeah, you can check how many messages you exchanged with your
               friends.
             </p>
             <p>Before you see your stats, you have to do a few things.</p>
+            <ol class="list-decimal list-inside">
+              <li v-for="item in outboarding" :key="item.id" class="mb-2 last:mb-0" v-html="item.description"></li>
+            </ol>
           </div>
           <BaseButton @click="isInfo = false">Understand</BaseButton>
         </div>
@@ -68,6 +71,7 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
 import TheUsers from "../src/components/the/Users.vue";
 import TheUser from "./components/the/User.vue";
+import { computed } from "vue";
 
 const isLoader = ref(false);
 const isLoaded = ref(false);
@@ -83,6 +87,73 @@ const validationFiles = ref<Validation>({
 });
 
 const mySwiper: Ref<SwiperType | null> = ref(null);
+
+const outboarding = computed(() => [
+  {
+    id: 1,
+    description: "Click account in the top right of Facebook.",
+  },
+  {
+    id: 2,
+    description: "Select <b>Settings & privacy</b>, then click <b>Settings</b>.",
+  },
+  {
+    id: 3,
+    description: "In the left column, click <b>Your Facebook information</b>.",
+  },
+  {
+    id: 4,
+    description: "Next to <b>Download profile information</b>, click View.",
+  },
+  {
+    id: 5,
+    description: "Click <b>Request a download</b>.",
+  },
+  {
+    id: 6,
+    description: "Select the profiles you’d like to download information from.",
+  },
+  {
+    id: 7,
+    description: "Click <b>Next</b>.",
+  },
+  {
+    id: 8,
+    description: "Choose <b>Select types of information</b>.",
+  },
+  {
+    id: 9,
+    description: "Select the <b>Messages</b>.",
+  },
+  {
+    id: 10,
+    description: "Click <b>Next</b>.",
+  },
+  {
+    id: 11,
+    description: "Choose <b>Data range</b> <i>All time</i> and <b>Format</b> <i>JSON</i>.",
+  },
+  {
+    id: 12,
+    description: "Click <b>Submit request</b>.",
+  },
+  {
+    id: 13,
+    description: "Now we have to wait for the data. 😊",
+  },
+  {
+    id: 14,
+    description: "When you will get the data click <b>Download</b>.",
+  },
+  {
+    id: 15,
+    description: "Download all files, and using <b>Select files</b> on app upload all files.",
+  },
+  {
+    id: 16,
+    description: "That's it. You can check your stats. 🤗",
+  },
+]);
 
 const setSwiper = (swiper: any) => {
   mySwiper.value = swiper;
@@ -120,9 +191,8 @@ const getFiles = async (files: FileList) => {
     };
   }
 
-  
   if (users.value.length) users.value = [];
-  
+
   loadingUser("start");
 
   try {
@@ -134,7 +204,6 @@ const getFiles = async (files: FileList) => {
         const userFolderName = entry.filename.split("/").at(-2);
         const index = users.value.findIndex((item: User) => item.id === userFolderName);
         const firstAndLastMessage = findFirstAndLastMessage(json.messages);
-        const numberOfYourMessagesInFile = getNumberOfYourMessagesInFile("Wojciech Skir\u00c5\u0082o", json.messages);
 
         if (userFolderName === undefined) continue;
 
@@ -146,7 +215,6 @@ const getFiles = async (files: FileList) => {
           if (firstAndLastMessage.lastMessage.timestamp_ms > users.value[index].info.lastMessage.timestamp_ms) {
             users.value[index].info.lastMessage = firstAndLastMessage.lastMessage;
           }
-          users.value[index].info.yourMessages += numberOfYourMessagesInFile;
         } else {
           const user: User = {
             id: userFolderName,
@@ -155,7 +223,6 @@ const getFiles = async (files: FileList) => {
             info: {
               totalMessages: json.messages.length,
               isGroup: json.participants.length > 2,
-              yourMessages: numberOfYourMessagesInFile,
               firstMessage: firstAndLastMessage.firstMessage,
               lastMessage: firstAndLastMessage.lastMessage,
             },
@@ -194,7 +261,6 @@ const getFileEntries = async (file: File) => {
   await zipReader.close();
 
   return entries;
-
 };
 
 /**
@@ -223,14 +289,6 @@ const findFirstAndLastMessage = (messages: Array<Message>) => {
     },
     { firstMessage: messages[0], lastMessage: messages[0] }
   );
-};
-
-/**
- * This function return number of messages given user
- * @param {Array<Message>} messages Array of message ovject
- */
-const getNumberOfYourMessagesInFile = (userName: string, messages: Array<Message>) => {
-  return messages.reduce((acc, message) => (message.sender_name === userName ? acc + 1 : acc), 0);
 };
 
 const resetLoader = (swiper: SwiperType) => {
