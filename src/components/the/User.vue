@@ -38,7 +38,7 @@
             <b class="ml-2 text-base">{{ user.info?.yourMessages }}</b>
           </span>
           <span class="text-sm text-gray-400">
-            Who start the conversation:
+            Who wrote the first message:
             <b class="ml-2 text-base">
               {{ $decode(user.info.firstMessage?.sender_name) }}
             </b>
@@ -56,6 +56,18 @@
             </b>
           </span>
           <span class="text-sm text-gray-400">
+           Who wrote the last message:
+            <b class="ml-2 text-base">
+              {{ $decode(user.info.lastMessage?.sender_name) }}
+            </b>
+          </span>
+          <span v-if="user.info.lastMessage?.content" class="text-sm text-gray-400">
+            Content of last message:
+            <b class="ml-2 text-base">
+              {{ $decode(user.info.lastMessage.content) }}
+            </b>
+          </span>
+          <span class="text-sm text-gray-400">
             Last message date:
             <b class="ml-2 text-base">
               {{ lastMessageDate }}
@@ -66,6 +78,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import type { User } from "../../../types/index";
 import { computed } from "vue";

@@ -1,11 +1,41 @@
 <template>
-  <main class="w-full bg-white md:max-w-[390px] md:border md:border-black">
+  <main class="w-full bg-white md:max-w-[390px] md:border overflow-hidden md:border-black relative">
+    <Transition
+      enter-from-class="-translate-x-full"
+      leave-to-class="-translate-x-full"
+      enter-active-class="duration-300 transition-translate"
+      leave-active-class="duration-300 transition-translate"
+    >
+      <div v-if="isInfo" class="absolute top-0 left-0 z-10 flex flex-col w-full h-full px-6 py-8 bg-white">
+        <div class="flex items-center justify-between w-full mb-8 gap-x-6">
+          <div class="h-9 w-9"></div>
+          <h2 class="text-lg font-semibold first-letter:uppercase">Outboarding</h2>
+          <button class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl" @click="isInfo = false">
+            <BaseIcon name="XMarkIcon" class="transition-colors duration-300" />
+          </button>
+        </div>
+        <div class="flex flex-col justify-between flex-1 gap-6 px-4 py-14 text-md">
+          <div class="grid grid-cols-1 gap-6">
+            <p>
+              If you want to know your messenger statistics you are in the right place. Yeah, you can check how many messages you exchanged with your
+              friends.
+            </p>
+            <p>Before you see your stats, you have to do a few things.</p>
+          </div>
+          <BaseButton @click="isInfo = false">Understand</BaseButton>
+        </div>
+      </div>
+    </Transition>
     <Swiper class="w-full h-full mySwiper" @swiper="setSwiper" @slide-change-transition-end="resetLoader">
       <SwiperSlide class="w-full h-screen md:h-[820px]">
         <div class="flex flex-col w-full h-full py-8">
           <div class="flex flex-col px-6">
-            <div class="flex items-center justify-center w-full mb-8 gap-x-6">
+            <div class="flex items-center justify-between w-full mb-8 gap-x-6">
+              <div class="h-9 w-9"></div>
               <h2 class="text-lg font-semibold first-letter:uppercase">messages</h2>
+              <button class="flex items-center justify-center border border-gray-100 h-9 w-9 rounded-xl" @click="isInfo = true">
+                <BaseIcon name="QuestionMarkCircleIcon" class="transition-colors duration-300" />
+              </button>
             </div>
           </div>
           <Transition name="fade">
@@ -41,7 +71,8 @@ import TheUser from "./components/the/User.vue";
 
 const isLoader = ref(false);
 const isLoaded = ref(false);
-const vFiles = ref<FileList | null>();
+const isInfo = ref(false);
+const vFiles = ref<FileList | null>(null);
 
 const selectedUser = ref<User | null>(null);
 const users: Ref<Array<User>> = ref([]);
@@ -89,61 +120,32 @@ const getFiles = async (files: FileList) => {
     };
   }
 
+  
+  if (users.value.length) users.value = [];
+  
   loadingUser("start");
-  if (users.value.length > 0) users.value = [];
-  for (const file of files) {
-    await getDataFile(file);
-  }
-  sortAndMapUsers();
-  users.value.length > 0 ? loadingUser("loaded") : loadingUser("error");
 
-  console.log("users", users.value);
-};
-
-const getDataFile = async (file: File) => {
-  return new Promise((resolve, _) => {
-    const reader = new FileReader();
-
-    reader.onload = async (event) => {
-      const blob = new Blob([event.target?.result!]);
-      const zipReader = new zip.ZipReader(new zip.BlobReader(blob));
-      let entries = (await zipReader.getEntries()) || [];
-
-      // entry filter
-      entries = entries.filter((item: any) => {
-        const extension = item.filename.split(".").pop();
-        return extension === "json";
-      });
-
-      // inbox
-      entries = entries.filter((item: any) => {
-        let folderName = item.filename.split("/");
-
-        if (folderName.length >= 2) {
-          folderName = folderName[1];
-          return folderName === "inbox" || folderName === "archived_threads";
-        }
-      });
+  try {
+    for (const file of files) {
+      const entries = await getFileEntries(file);
 
       for (const entry of entries) {
         const json: JSON = JSON.parse(await entry.getData?.(new zip.TextWriter())!);
-        const userFolderName = entry.filename.split("/")[2];
-
+        const userFolderName = entry.filename.split("/").at(-2);
         const index = users.value.findIndex((item: User) => item.id === userFolderName);
         const firstAndLastMessage = findFirstAndLastMessage(json.messages);
         const numberOfYourMessagesInFile = getNumberOfYourMessagesInFile("Wojciech Skir\u00c5\u0082o", json.messages);
 
+        if (userFolderName === undefined) continue;
+
         if (index > -1) {
           users.value[index].info.totalMessages += json.messages.length;
-
           if (firstAndLastMessage.firstMessage.timestamp_ms < users.value[index].info.firstMessage.timestamp_ms) {
             users.value[index].info.firstMessage = firstAndLastMessage.firstMessage;
           }
-
           if (firstAndLastMessage.lastMessage.timestamp_ms > users.value[index].info.lastMessage.timestamp_ms) {
             users.value[index].info.lastMessage = firstAndLastMessage.lastMessage;
           }
-
           users.value[index].info.yourMessages += numberOfYourMessagesInFile;
         } else {
           const user: User = {
@@ -152,7 +154,7 @@ const getDataFile = async (file: File) => {
             ranking: null,
             info: {
               totalMessages: json.messages.length,
-              isGroup: json.thread_type === "RegularGroup",
+              isGroup: json.participants.length > 2,
               yourMessages: numberOfYourMessagesInFile,
               firstMessage: firstAndLastMessage.firstMessage,
               lastMessage: firstAndLastMessage.lastMessage,
@@ -163,16 +165,36 @@ const getDataFile = async (file: File) => {
         }
       }
 
-      await zipReader.close();
-      resolve(reader.result);
-    };
+      sortAndMapUsers();
+    }
+  } catch (error) {
+    console.log("error", error);
+  } finally {
+    users.value.length > 0 ? loadingUser("loaded") : loadingUser("error");
+  }
+};
 
-    reader.onerror = () => {
-      resolve(reader.result);
-    };
+const getFileEntries = async (file: File) => {
+  const zipReader = new zip.ZipReader(new zip.BlobReader(file));
+  let entries = (await zipReader.getEntries()) || [];
 
-    reader.readAsArrayBuffer(file);
+  // entry filter
+  entries = entries.filter((item: zip.Entry) => {
+    const extension = item.filename.split(".").pop();
+    return extension === "json";
   });
+
+  // inbox and archived_threads
+  entries = entries.filter((item: zip.Entry) => {
+    const folderName = item.filename.split("/");
+
+    return folderName.includes("inbox") || folderName.includes("archived_threads");
+  });
+
+  await zipReader.close();
+
+  return entries;
+
 };
 
 /**

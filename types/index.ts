@@ -13,9 +13,12 @@ export interface Message {
 }
 
 export interface JSON {
-  title: string;
-  thread_type: "Regular" | "RegularGroup";
+  is_still_participant: boolean;
+  magic_words: unknown[];
   messages: Array<Message>;
+  participants: Array<Participant>;
+  thread_path: string;
+  title: string;
 }
 export interface User {
   id: string;
@@ -27,4 +30,8 @@ export interface User {
 export interface Validation {
   is: boolean | null;
   message: string;
+}
+
+interface Participant {
+  name: string;
 }

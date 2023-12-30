@@ -17,6 +17,7 @@
     />
   </div>
 </template>
+
 <script setup lang="ts">
 defineEmits<{
   (e: "update:modelValue", value: string): void;
