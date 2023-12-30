@@ -5,10 +5,10 @@ I was curious and decided to create an application that let us know that thing.
 
 What you can check:
 - Ranking of 100 people which you wrote the most,
-- How many messages you wrote to your friend,
 - First message date and content,
-- Last message date,
+- Last message date and content,
 - Who started the conversation
+- Who wrote last message
 
 ## Instructions
 1. Click account in the top right of Facebook.
