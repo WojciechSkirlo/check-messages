@@ -7,8 +7,8 @@ What you can check:
 - Ranking of 100 people which you wrote the most,
 - First message date and content,
 - Last message date and content,
-- Who started the conversation
-- Who wrote last message
+- Who started the conversation,
+- Who wrote last message.
 
 ## Instructions
 1. Click account in the top right of Facebook.
