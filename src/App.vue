@@ -255,7 +255,7 @@ const getFileEntries = async (file: File) => {
   entries = entries.filter((item: zip.Entry) => {
     const folderName = item.filename.split("/");
 
-    return folderName.includes("inbox") || folderName.includes("archived_threads");
+    return folderName.includes("inbox") || folderName.includes("archived_threads") || folderName.includes("e2ee_cutover");
   });
 
   await zipReader.close();
